@@ -1,6 +1,6 @@
 import prisma from "@/lib/prisma";
 import { type NextRequest, NextResponse } from "next/server";
-import type { EStatus } from "@/app/generated/prisma";
+import type { EStatus } from "@prisma/client";
 
 export async function GET(request: NextRequest) {
   try {

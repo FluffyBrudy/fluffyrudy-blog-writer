@@ -2,7 +2,7 @@ import prisma from "@/lib/prisma";
 import { type NextRequest, NextResponse } from "next/server";
 import { createSlug } from "@/lib/editor.helper";
 import type { PostCreateBody } from "@/types/post";
-import type { PrismaClientKnownRequestError } from "@/app/generated/prisma/runtime/library";
+import type { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 interface RouteParams {
   params: Promise<{ id: string }>;

@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { api } from "@/lib/api";
-import type { posts, tags } from "@/app/generated/prisma";
+import type { posts, tags } from "@prisma/client";
 import { ArrowLeft, Calendar, Clock, Share2 } from "lucide-react";
 
 type PostWithTags = posts & { tags: tags[] };

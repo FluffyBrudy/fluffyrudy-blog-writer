@@ -15,7 +15,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import TagInput from "@/app/components/editor/ui/TagInput";
 import { api } from "@/lib/api";
-import type { posts, tags } from "@/app/generated/prisma";
+import type { tags, posts } from "@prisma/client";
 import type { PostCreateBody } from "@/types/post";
 import { ArrowLeft, Save, Eye } from "lucide-react";
 import Link from "next/link";

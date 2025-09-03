@@ -1,4 +1,4 @@
-import { PrismaClientKnownRequestError } from "@/app/generated/prisma/runtime/library";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { createSlug } from "@/lib/editor.helper";
 import prisma from "@/lib/prisma";
 import { PostCreateBody } from "@/types/post";

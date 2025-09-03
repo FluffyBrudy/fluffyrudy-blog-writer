@@ -1,4 +1,4 @@
-import { type posts } from "@/app/generated/prisma";
+import { type posts } from "@prisma/client";
 
 export type PostCreateBody = Omit<
   posts,

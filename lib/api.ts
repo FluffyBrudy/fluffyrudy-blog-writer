@@ -1,4 +1,4 @@
-import type { posts, tags } from "@/app/generated/prisma";
+import type { posts, tags } from "@prisma/client";
 import type { PostCreateBody } from "@/types/post";
 import axios, {
   type AxiosError,
