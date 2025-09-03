@@ -118,8 +118,8 @@ export default function ModernPostEditor() {
       const post: PostCreateBody = {
         title: title.trim(),
         content: content.trim(),
-        excerpt: excerpt.trim() || undefined,
-        coverImage: coverImage.trim() || undefined,
+        excerpt: excerpt.trim() || null,
+        coverImage: coverImage.trim() || null,
         tags,
         status: publishStatus,
       };
