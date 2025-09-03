@@ -21,6 +21,7 @@ import { ArrowLeft, Save, Eye } from "lucide-react";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import Image from "next/image";
 
 type PostWithTags = posts & { tags: tags[] };
 
@@ -181,7 +182,8 @@ export default function EditPostPage() {
 
               {coverImage && (
                 <div className="relative h-64 md:h-96 rounded-lg overflow-hidden">
-                  <img
+                  <Image
+                    fill
                     src={coverImage || "/placeholder.svg"}
                     alt={title}
                     className="w-full h-full object-cover"
@@ -316,7 +318,8 @@ export default function EditPostPage() {
                 />
                 {coverImage && (
                   <div className="relative h-48 rounded-lg overflow-hidden">
-                    <img
+                    <Image
+                      fill
                       src={coverImage || "/placeholder.svg"}
                       alt="Cover preview"
                       className="w-full h-full object-cover"

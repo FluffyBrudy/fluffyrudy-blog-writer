@@ -1,10 +1,5 @@
 import { validateTags } from "@/lib/editor.helper";
-import React, { useState, KeyboardEvent, useEffect } from "react";
-
-interface ITagStatus {
-  valid: string[];
-  invalid: string[];
-}
+import React, { useState, KeyboardEvent } from "react";
 
 interface TagInputProps {
   tags: string[];

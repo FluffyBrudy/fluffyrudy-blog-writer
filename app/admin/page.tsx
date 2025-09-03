@@ -39,7 +39,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { api } from "@/lib/api";
-import type { posts, tags } from "../generated/prisma";
+import type { posts, tags } from "@prisma/client";
 import {
   MoreHorizontal,
   Plus,
@@ -478,8 +478,9 @@ export default function AdminDashboard() {
                                     Delete Post
                                   </AlertDialogTitle>
                                   <AlertDialogDescription>
-                                    Are you sure you want to delete "
-                                    {post.title}"? This action cannot be undone.
+                                    Are you sure you want to delete &puto;
+                                    {post.title}&apos;? This action cannot be
+                                    undone.
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>

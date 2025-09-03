@@ -34,6 +34,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 interface AutoSaveStatus {
   status: "idle" | "saving" | "saved" | "error";
@@ -400,7 +401,8 @@ export default function ModernPostEditor() {
                 />
                 {coverImage && (
                   <div className="relative aspect-video rounded-lg overflow-hidden border">
-                    <img
+                    <Image
+                      fill
                       src={coverImage || "/placeholder.svg"}
                       alt="Cover preview"
                       className="w-full h-full object-cover"

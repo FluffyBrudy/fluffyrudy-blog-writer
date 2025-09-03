@@ -17,7 +17,6 @@ type PostWithTags = posts & { tags: tags[] };
 
 export default function BlogPostPage() {
   const params = useParams();
-  const router = useRouter();
   const [post, setPost] = useState<PostWithTags | null>(null);
   const [relatedPosts, setRelatedPosts] = useState<PostWithTags[]>([]);
   const [loading, setLoading] = useState(true);
@@ -80,7 +79,7 @@ export default function BlogPostPage() {
           text: post.excerpt || "",
           url: window.location.href,
         });
-      } catch (error) {
+      } catch {
         navigator.clipboard.writeText(window.location.href);
       }
     } else {
@@ -113,7 +112,8 @@ export default function BlogPostPage() {
         <div className="text-center">
           <h1 className="text-4xl font-black mb-4">Post Not Found</h1>
           <p className="text-muted-foreground mb-6">
-            The blog post you're looking for doesn't exist or has been removed.
+            The blog post you&apos;re looking for doesn&apos;t exist or has been
+            removed.
           </p>
           <Link href="/blog">
             <Button>
