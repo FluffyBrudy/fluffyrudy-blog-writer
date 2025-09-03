@@ -1,30 +1,9 @@
+import { validateTags } from "@/lib/editor.helper";
 import React, { useState, KeyboardEvent, useEffect } from "react";
 
 interface ITagStatus {
   valid: string[];
   invalid: string[];
-}
-
-export function createSlug(title: string) {
-  const filteredTitle = title.replace(/[^a-zA-Z0-9\s-]/g, "");
-  const slug = filteredTitle.replace(/\s/g, "-");
-  return slug;
-}
-
-export function validateTag(tag: string) {
-  return /^[a-z]+(?:-[a-z0-9]+)*$/.test(tag);
-}
-
-export function validateTags(tags: string[]) {
-  const tagsStatus: ITagStatus = {
-    valid: [],
-    invalid: [],
-  };
-  tags.forEach((tag) => {
-    if (validateTag(tag)) tagsStatus.valid.push(tag);
-    else tagsStatus.invalid.push(tag);
-  });
-  return tagsStatus;
 }
 
 interface TagInputProps {
