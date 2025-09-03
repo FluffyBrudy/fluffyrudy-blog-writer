@@ -19,6 +19,7 @@ model posts {
   status     EStatus   @default(DRAFT)
   createdAt  DateTime? @default(now()) @db.Timestamptz(6)
   updatedAt  DateTime? @default(now()) @db.Timestamptz(6)
+  tags tags[]
 
   @@index([slug])
   @@schema("markdown")
@@ -27,6 +28,15 @@ model posts {
 model tags {
   id   Int    @id @default(autoincrement())
   name String @unique @db.VarChar(32)
+  posts posts[]
+
+  @@schema("markdown")
+}
+
+model SuperUser {
+  id Int @id @default(autoincrement())
+  email String @unique
+  secret String @db.VarChar(255)
 
   @@schema("markdown")
 }
