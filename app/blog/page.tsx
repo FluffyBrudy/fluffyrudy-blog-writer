@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { api } from "@/lib/api";
-import type { posts, tags } from "../generated/prisma";
+import type { posts, tags } from "@prisma/client";
 import { Search, Calendar, Clock } from "lucide-react";
 
 type PostWithTags = posts & { tags: tags[] };
