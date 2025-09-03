@@ -1,12 +1,15 @@
 import prisma from "@/lib/prisma";
 import { HttpStatusCode } from "axios";
-import { useParams } from "next/navigation";
 import { NextResponse, type NextRequest } from "next/server";
 
-export async function GET(requset: NextRequest) {
+interface RouteParams {
+  params: Promise<{ id: string }>;
+}
+
+export async function GET(requset: NextRequest, { params }: RouteParams) {
   try {
-    const params = useParams() as { id: string };
-    const id = Number(params.id);
+    const params_ = await params;
+    const id = Number(params_.id);
 
     const post = prisma.posts.findUnique({
       where: { id },
