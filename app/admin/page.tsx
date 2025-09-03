@@ -83,51 +83,71 @@ export default function AdminDashboard() {
     draftPosts: 0,
     totalTags: 0,
   });
-  const [loading, setLoading] = useState(true);
+  const [statsLoading, setStatsLoading] = useState(true);
+  const [postsLoading, setPostsLoading] = useState(true);
+  const [tagsLoading, setTagsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [deletingPostId, setDeletingPostId] = useState<number | null>(null);
 
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      const [
-        allPostsResponse,
-        publishedResponse,
-        draftsResponse,
-        tagsResponse,
-      ] = await Promise.all([
-        api.getPosts({ limit: 100 }),
-        api.getPosts({ status: "PUBLISHED", limit: 100 }),
-        api.getPosts({ status: "DRAFT", limit: 100 }),
-        api.getTags(),
-      ]);
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const statsResponse = await api.getStats();
+        setStats(statsResponse.data);
+      } catch (error) {
+        console.error("Error fetching stats:", error);
+      } finally {
+        setStatsLoading(false);
+      }
+    };
 
-      setPostsData(allPostsResponse.data);
-      setAllTags(tagsResponse.data);
-
-      setStats({
-        totalPosts: allPostsResponse.data.pagination.total,
-        publishedPosts: publishedResponse.data.pagination.total,
-        draftPosts: draftsResponse.data.pagination.total,
-        totalTags: tagsResponse.data.length,
-      });
-    } catch (error) {
-      console.error("Error fetching admin data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    fetchStats();
+  }, []);
 
   useEffect(() => {
-    fetchData();
+    const fetchPosts = async () => {
+      try {
+        setPostsLoading(true);
+        const postsResponse = await api.getPosts({
+          limit: 50,
+          includeContent: false,
+        });
+        setPostsData(postsResponse.data);
+      } catch (error) {
+        console.error("Error fetching posts:", error);
+      } finally {
+        setPostsLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, []);
+
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const tagsResponse = await api.getTags();
+        setAllTags(tagsResponse.data);
+      } catch (error) {
+        console.error("Error fetching tags:", error);
+      } finally {
+        setTagsLoading(false);
+      }
+    };
+
+    fetchTags();
   }, []);
 
   const handleDeletePost = async (postId: number) => {
     try {
       await api.deletePost(postId);
       setDeletingPostId(null);
-      fetchData(); // Refresh data
+      const postsResponse = await api.getPosts({
+        limit: 50,
+        includeContent: false,
+      });
+      setPostsData(postsResponse.data);
     } catch (error) {
       console.error("Error deleting post:", error);
     }
@@ -143,14 +163,18 @@ export default function AdminDashboard() {
 
       await api.updatePost(postId, {
         title: post.title,
-        content: post.content,
+        content: post.content || "",
         excerpt: post.excerpt,
         coverImage: post.coverImage,
         status: newStatus,
         tags: post.tags.map((t) => t.name),
       });
 
-      fetchData(); // Refresh data
+      const postsResponse = await api.getPosts({
+        limit: 50,
+        includeContent: false,
+      });
+      setPostsData(postsResponse.data);
     } catch (error) {
       console.error("Error updating post status:", error);
     }
@@ -175,27 +199,8 @@ export default function AdminDashboard() {
     });
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-8">
-          <div className="animate-pulse space-y-8">
-            <div className="h-12 bg-muted rounded-lg w-1/3"></div>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="h-32 bg-muted rounded-lg"></div>
-              ))}
-            </div>
-            <div className="h-96 bg-muted rounded-lg"></div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -226,62 +231,84 @@ export default function AdminDashboard() {
       </header>
 
       <div className="container mx-auto px-4 py-8">
-        {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Posts</CardTitle>
-              <FileText className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalPosts}</div>
-              <p className="text-xs text-muted-foreground">
-                All posts in your blog
-              </p>
-            </CardContent>
-          </Card>
+          {statsLoading ? (
+            [...Array(4)].map((_, i) => (
+              <Card key={i}>
+                <CardContent className="p-6">
+                  <div className="animate-pulse space-y-2">
+                    <div className="h-4 bg-muted rounded w-1/2"></div>
+                    <div className="h-8 bg-muted rounded w-1/3"></div>
+                    <div className="h-3 bg-muted rounded w-3/4"></div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            <>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    Total Posts
+                  </CardTitle>
+                  <FileText className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats.totalPosts}</div>
+                  <p className="text-xs text-muted-foreground">
+                    All posts in your blog
+                  </p>
+                </CardContent>
+              </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Published</CardTitle>
-              <Globe className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">
-                {stats.publishedPosts}
-              </div>
-              <p className="text-xs text-muted-foreground">Live on your blog</p>
-            </CardContent>
-          </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    Published
+                  </CardTitle>
+                  <Globe className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-green-600">
+                    {stats.publishedPosts}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Live on your blog
+                  </p>
+                </CardContent>
+              </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Drafts</CardTitle>
-              <FileX className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-orange-600">
-                {stats.draftPosts}
-              </div>
-              <p className="text-xs text-muted-foreground">Work in progress</p>
-            </CardContent>
-          </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Drafts</CardTitle>
+                  <FileX className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-orange-600">
+                    {stats.draftPosts}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Work in progress
+                  </p>
+                </CardContent>
+              </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Tags</CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalTags}</div>
-              <p className="text-xs text-muted-foreground">
-                Content categories
-              </p>
-            </CardContent>
-          </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Tags</CardTitle>
+                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats.totalTags}</div>
+                  <p className="text-xs text-muted-foreground">
+                    Content categories
+                  </p>
+                </CardContent>
+              </Card>
+            </>
+          )}
         </div>
 
-        {/* Posts Management */}
         <Card>
           <CardHeader>
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -310,7 +337,16 @@ export default function AdminDashboard() {
             </div>
           </CardHeader>
           <CardContent>
-            {filteredPosts.length === 0 ? (
+            {postsLoading ? (
+              <div className="space-y-4">
+                {[...Array(5)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-16 bg-muted rounded animate-pulse"
+                  ></div>
+                ))}
+              </div>
+            ) : filteredPosts.length === 0 ? (
               <div className="text-center py-12">
                 <h3 className="text-lg font-semibold mb-2">No posts found</h3>
                 <p className="text-muted-foreground mb-4">
@@ -471,13 +507,21 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
 
-        {/* Tags Management */}
         <Card className="mt-8">
           <CardHeader>
             <CardTitle>Tags Management</CardTitle>
           </CardHeader>
           <CardContent>
-            {allTags.length === 0 ? (
+            {tagsLoading ? (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {[...Array(8)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-16 bg-muted rounded animate-pulse"
+                  ></div>
+                ))}
+              </div>
+            ) : allTags.length === 0 ? (
               <div className="text-center py-8">
                 <p className="text-muted-foreground">No tags created yet</p>
               </div>

@@ -1,4 +1,4 @@
-import { type posts, type tags } from "@/app/generated/prisma";
+import type { posts, tags } from "@/app/generated/prisma";
 import type { PostCreateBody } from "@/types/post";
 import axios, {
   type AxiosError,
@@ -14,6 +14,13 @@ interface PostsResponse {
     offset: number;
     hasMore: boolean;
   };
+}
+
+interface StatsResponse {
+  totalPosts: number;
+  publishedPosts: number;
+  draftPosts: number;
+  totalTags: number;
 }
 
 class ApiClient {
@@ -56,12 +63,14 @@ class ApiClient {
     tag?: string;
     limit?: number;
     offset?: number;
+    includeContent?: boolean;
   }) {
     const searchParams = new URLSearchParams();
     if (params?.status) searchParams.set("status", params.status);
     if (params?.tag) searchParams.set("tag", params.tag);
     if (params?.limit) searchParams.set("limit", params.limit.toString());
     if (params?.offset) searchParams.set("offset", params.offset.toString());
+    if (params?.includeContent) searchParams.set("includeContent", "true");
 
     const response = await this.client.get<PostsResponse>(
       `/api/posts?${searchParams.toString()}`
@@ -105,6 +114,11 @@ class ApiClient {
 
   async createTag(name: string) {
     const response = await this.client.post<tags>("/api/tags", { name });
+    return response;
+  }
+
+  async getStats() {
+    const response = await this.client.get<StatsResponse>("/api/stats");
     return response;
   }
 }

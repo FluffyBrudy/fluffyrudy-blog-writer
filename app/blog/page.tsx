@@ -25,7 +25,8 @@ interface PostsResponse {
 
 export default function BlogPage() {
   const [postsData, setPostsData] = useState<PostsResponse | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [postsLoading, setPostsLoading] = useState(true);
+  const [tagsLoading, setTagsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [allTags, setAllTags] = useState<
@@ -33,23 +34,38 @@ export default function BlogPage() {
   >([]);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchTags = async () => {
       try {
-        setLoading(true);
-        const [postsResponse, tagsResponse] = await Promise.all([
-          api.getPosts({ status: "PUBLISHED", tag: selectedTag || undefined }),
-          api.getTags(),
-        ]);
-        setPostsData(postsResponse.data);
+        const tagsResponse = await api.getTags();
         setAllTags(tagsResponse.data);
       } catch (error) {
-        console.error("Error fetching blog data:", error);
+        console.error("Error fetching tags:", error);
       } finally {
-        setLoading(false);
+        setTagsLoading(false);
       }
     };
 
-    fetchData();
+    fetchTags();
+  }, []);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        setPostsLoading(true);
+        const postsResponse = await api.getPosts({
+          status: "PUBLISHED",
+          tag: selectedTag || undefined,
+          includeContent: false,
+        });
+        setPostsData(postsResponse.data);
+      } catch (error) {
+        console.error("Error fetching posts:", error);
+      } finally {
+        setPostsLoading(false);
+      }
+    };
+
+    fetchPosts();
   }, [selectedTag]);
 
   const filteredPosts =
@@ -70,32 +86,10 @@ export default function BlogPage() {
 
   const getReadingTime = (content: string) => {
     const wordsPerMinute = 200;
-    const wordCount = content.split(/\s+/).length;
+    const wordCount = content?.split(/\s+/).length || 0;
     const readingTime = Math.ceil(wordCount / wordsPerMinute);
     return `${readingTime} min read`;
   };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-8">
-          <div className="animate-pulse space-y-8">
-            <div className="h-12 bg-muted rounded-lg w-1/3"></div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="space-y-4">
-                  <div className="h-48 bg-muted rounded-lg"></div>
-                  <div className="h-6 bg-muted rounded w-3/4"></div>
-                  <div className="h-4 bg-muted rounded w-full"></div>
-                  <div className="h-4 bg-muted rounded w-2/3"></div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -153,28 +147,52 @@ export default function BlogPage() {
             <main className="flex-1">
               <div className="mb-8">
                 <h3 className="text-lg font-semibold mb-4">Filter by Topic</h3>
-                <div className="flex flex-wrap gap-2">
-                  <Button
-                    variant={selectedTag === null ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setSelectedTag(null)}
-                  >
-                    All Posts
-                  </Button>
-                  {allTags.map((tag) => (
+                {tagsLoading ? (
+                  <div className="flex gap-2">
+                    {[...Array(5)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="h-8 w-20 bg-muted rounded animate-pulse"
+                      ></div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
                     <Button
-                      key={tag.id}
-                      variant={selectedTag === tag.name ? "default" : "outline"}
+                      variant={selectedTag === null ? "default" : "outline"}
                       size="sm"
-                      onClick={() => setSelectedTag(tag.name)}
+                      onClick={() => setSelectedTag(null)}
                     >
-                      {tag.name} ({tag._count.posts})
+                      All Posts
                     </Button>
-                  ))}
-                </div>
+                    {allTags.map((tag) => (
+                      <Button
+                        key={tag.id}
+                        variant={
+                          selectedTag === tag.name ? "default" : "outline"
+                        }
+                        size="sm"
+                        onClick={() => setSelectedTag(tag.name)}
+                      >
+                        {tag.name} ({tag._count.posts})
+                      </Button>
+                    ))}
+                  </div>
+                )}
               </div>
 
-              {filteredPosts.length === 0 ? (
+              {postsLoading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {[...Array(6)].map((_, i) => (
+                    <div key={i} className="space-y-4">
+                      <div className="h-48 bg-muted rounded-lg animate-pulse"></div>
+                      <div className="h-6 bg-muted rounded w-3/4 animate-pulse"></div>
+                      <div className="h-4 bg-muted rounded w-full animate-pulse"></div>
+                      <div className="h-4 bg-muted rounded w-2/3 animate-pulse"></div>
+                    </div>
+                  ))}
+                </div>
+              ) : filteredPosts.length === 0 ? (
                 <div className="text-center py-12">
                   <h3 className="text-xl font-semibold mb-2">No posts found</h3>
                   <p className="text-muted-foreground">
@@ -211,7 +229,7 @@ export default function BlogPage() {
                             </div>
                             <div className="flex items-center gap-1">
                               <Clock className="h-4 w-4" />
-                              {getReadingTime(post.content)}
+                              {getReadingTime(post.content || "")}
                             </div>
                           </div>
 
@@ -263,26 +281,37 @@ export default function BlogPage() {
                   <h3 className="font-semibold">Popular Tags</h3>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-2">
-                    {allTags.slice(0, 10).map((tag) => (
-                      <div
-                        key={tag.id}
-                        className="flex items-center justify-between"
-                      >
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="p-0 h-auto justify-start"
-                          onClick={() => setSelectedTag(tag.name)}
+                  {tagsLoading ? (
+                    <div className="space-y-2">
+                      {[...Array(5)].map((_, i) => (
+                        <div
+                          key={i}
+                          className="h-6 bg-muted rounded animate-pulse"
+                        ></div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {allTags.slice(0, 10).map((tag) => (
+                        <div
+                          key={tag.id}
+                          className="flex items-center justify-between"
                         >
-                          #{tag.name}
-                        </Button>
-                        <span className="text-sm text-muted-foreground">
-                          {tag._count.posts}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="p-0 h-auto justify-start"
+                            onClick={() => setSelectedTag(tag.name)}
+                          >
+                            #{tag.name}
+                          </Button>
+                          <span className="text-sm text-muted-foreground">
+                            {tag._count.posts}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </aside>

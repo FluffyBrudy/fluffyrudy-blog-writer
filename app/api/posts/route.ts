@@ -1,6 +1,6 @@
 import prisma from "@/lib/prisma";
 import { type NextRequest, NextResponse } from "next/server";
-import { EStatus } from "@/app/generated/prisma";
+import type { EStatus } from "@/app/generated/prisma";
 
 export async function GET(request: NextRequest) {
   try {
@@ -9,6 +9,7 @@ export async function GET(request: NextRequest) {
     const tag = searchParams.get("tag");
     const limit = Number.parseInt(searchParams.get("limit") || "10");
     const offset = Number.parseInt(searchParams.get("offset") || "0");
+    const includeContent = searchParams.get("includeContent") === "true";
 
     const where: any = {};
     if (status) where.status = status;
@@ -20,8 +21,22 @@ export async function GET(request: NextRequest) {
 
     const posts = await prisma.posts.findMany({
       where,
-      include: {
-        tags: true,
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        excerpt: true,
+        coverImage: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
+        content: includeContent,
+        tags: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",
