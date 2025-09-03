@@ -32,6 +32,7 @@ export default function BlogPage() {
   const [allTags, setAllTags] = useState<
     (tags & { _count: { posts: number } })[]
   >([]);
+  const [postsError, setPostsError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchTags = async () => {
@@ -52,6 +53,7 @@ export default function BlogPage() {
     const fetchPosts = async () => {
       try {
         setPostsLoading(true);
+        setPostsError(null);
         const postsResponse = await api.getPosts({
           status: "PUBLISHED",
           tag: selectedTag || undefined,
@@ -60,6 +62,11 @@ export default function BlogPage() {
         setPostsData(postsResponse.data);
       } catch (error) {
         console.error("Error fetching posts:", error);
+        setPostsError("Failed to load posts");
+        setPostsData({
+          posts: [],
+          pagination: { total: 0, limit: 0, offset: 0, hasMore: false },
+        });
       } finally {
         setPostsLoading(false);
       }
@@ -68,12 +75,11 @@ export default function BlogPage() {
     fetchPosts();
   }, [selectedTag]);
 
-  const filteredPosts =
-    postsData?.posts.filter(
-      (post) =>
-        post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        post.excerpt?.toLowerCase().includes(searchTerm.toLowerCase())
-    ) || [];
+  const filteredPosts = (postsData?.posts || []).filter(
+    (post) =>
+      post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      post.excerpt?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const formatDate = (date: string | Date | null) => {
     if (!date) return "";
@@ -98,9 +104,7 @@ export default function BlogPage() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
               <h1 className="text-4xl font-black text-balance">Our Blog</h1>
-              <p className="text-muted-foreground mt-2">
-                Discover insights, tutorials, and stories from our team
-              </p>
+              <p className="text-muted-foreground mt-2">Sharing is caring</p>
             </div>
             <div className="flex items-center gap-4">
               <div className="relative">
@@ -127,7 +131,7 @@ export default function BlogPage() {
               Our Blog
             </h1>
             <p className="text-xl text-muted-foreground text-pretty max-w-2xl mx-auto">
-              Discover insights, tutorials, and stories from our team
+              Teaching other is important for self improvement
             </p>
 
             <div className="max-w-md mx-auto">
@@ -191,6 +195,13 @@ export default function BlogPage() {
                       <div className="h-4 bg-muted rounded w-2/3 animate-pulse"></div>
                     </div>
                   ))}
+                </div>
+              ) : postsError ? (
+                <div className="text-center py-12">
+                  <h3 className="text-xl font-semibold mb-2 text-destructive">
+                    Error Loading Posts
+                  </h3>
+                  <p className="text-muted-foreground">{postsError}</p>
                 </div>
               ) : filteredPosts.length === 0 ? (
                 <div className="text-center py-12">

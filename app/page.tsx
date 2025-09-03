@@ -46,15 +46,14 @@ export default function Home() {
           <div className="max-w-4xl mx-auto text-center space-y-8">
             <div className="space-y-4">
               <Badge variant="secondary" className="px-4 py-2">
-                Modern Blog Platform
+                Blog Platform
               </Badge>
               <h1 className="text-4xl md:text-6xl font-black text-balance leading-tight">
-                Write, Publish, and Share Your Stories
+                Write, Publish, and Share Stories
               </h1>
               <p className="text-xl text-muted-foreground text-pretty max-w-2xl mx-auto leading-relaxed">
-                BlogCraft is a modern blog platform that helps you focus on what
-                matters most - creating amazing content that resonates with your
-                audience.
+                BlogCraft is a modern tech web application that helps creating
+                amazing content.
               </p>
             </div>
 
@@ -88,8 +87,7 @@ export default function Home() {
                 Everything You Need to Blog
               </h2>
               <p className="text-xl text-muted-foreground text-pretty max-w-2xl mx-auto">
-                Powerful features designed to help you create, manage, and grow
-                your blog with ease.
+                features designed to help create, manage, blogs
               </p>
             </div>
 

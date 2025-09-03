@@ -128,7 +128,6 @@ export default function BlogPostPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
@@ -138,7 +137,12 @@ export default function BlogPostPage() {
                 Back to Blog
               </Button>
             </Link>
-            <Button variant="outline" size="sm" onClick={handleShare}>
+            <Button
+              title="not implemented"
+              variant="outline"
+              size="sm"
+              onClick={handleShare}
+            >
               <Share2 className="mr-2 h-4 w-4" />
               Share
             </Button>
@@ -147,7 +151,6 @@ export default function BlogPostPage() {
       </header>
 
       <article className="container mx-auto px-4 py-8 max-w-4xl">
-        {/* Post Header */}
         <header className="mb-8 text-center">
           <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground mb-4">
             <div className="flex items-center gap-1">
@@ -181,7 +184,6 @@ export default function BlogPostPage() {
           )}
         </header>
 
-        {/* Cover Image */}
         {post.coverImage && (
           <div className="relative h-64 md:h-96 mb-8 rounded-lg overflow-hidden">
             <Image
@@ -194,7 +196,6 @@ export default function BlogPostPage() {
           </div>
         )}
 
-        {/* Post Content */}
         <div className="prose prose-lg prose-slate dark:prose-invert max-w-none mb-12">
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
@@ -238,7 +239,6 @@ export default function BlogPostPage() {
           </ReactMarkdown>
         </div>
 
-        {/* Related Posts */}
         {relatedPosts.length > 0 && (
           <section className="border-t border-border pt-8">
             <h2 className="text-2xl font-black mb-6">Related Posts</h2>
@@ -284,7 +284,6 @@ export default function BlogPostPage() {
           </section>
         )}
 
-        {/* Call to Action */}
         <section className="text-center mt-12 pt-8 border-t border-border">
           <h3 className="text-xl font-black mb-4">Enjoyed this post?</h3>
           <p className="text-muted-foreground mb-6">

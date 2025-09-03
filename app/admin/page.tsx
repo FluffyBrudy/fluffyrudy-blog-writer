@@ -208,9 +208,6 @@ export default function AdminDashboard() {
               <h1 className="text-4xl font-black text-balance">
                 Admin Dashboard
               </h1>
-              <p className="text-muted-foreground mt-2">
-                Manage your blog posts, tags, and content
-              </p>
             </div>
             <div className="flex items-center gap-4">
               <Link href="/blog">

@@ -5,12 +5,13 @@ import type { PostCreateBody } from "@/types/post";
 import type { PrismaClientKnownRequestError } from "@/app/generated/prisma/runtime/library";
 
 interface RouteParams {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const id = Number.parseInt(params.id);
+    const params_ = await params;
+    const id = Number.parseInt(params_.id);
 
     if (isNaN(id)) {
       return NextResponse.json({ error: "Invalid post ID" }, { status: 400 });
@@ -39,7 +40,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
 export async function PUT(request: NextRequest, { params }: RouteParams) {
   try {
-    const id = Number.parseInt(params.id);
+    const params_ = await params;
+    const id = Number.parseInt(params_.id);
     const body = (await request.json()) as PostCreateBody;
     const { title, content, tags, coverImage, excerpt, status } = body;
 
@@ -99,7 +101,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
-    const id = Number.parseInt(params.id);
+    const params_ = await params;
+    const id = Number.parseInt(params_.id);
 
     if (isNaN(id)) {
       return NextResponse.json({ error: "Invalid post ID" }, { status: 400 });

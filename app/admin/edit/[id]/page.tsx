@@ -122,7 +122,6 @@ export default function EditPostPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
@@ -155,7 +154,6 @@ export default function EditPostPage() {
 
       <div className="container mx-auto px-4 py-8">
         {previewMode ? (
-          /* Preview Mode */
           <div className="max-w-4xl mx-auto">
             <article className="space-y-6">
               <header className="text-center space-y-4">
@@ -192,16 +190,43 @@ export default function EditPostPage() {
               )}
 
               <div className="prose prose-lg prose-slate dark:prose-invert max-w-none">
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  components={{
+                    h1: ({ children }) => (
+                      <h1 className="text-3xl font-black mt-8 mb-4 text-balance">
+                        {children}
+                      </h1>
+                    ),
+                    h2: ({ children }) => (
+                      <h2 className="text-2xl font-black mt-6 mb-3 text-balance">
+                        {children}
+                      </h2>
+                    ),
+                    h3: ({ children }) => (
+                      <h3 className="text-xl font-black mt-5 mb-2 text-balance">
+                        {children}
+                      </h3>
+                    ),
+                    p: ({ children }) => (
+                      <p className="text-pretty leading-relaxed mb-4">
+                        {children}
+                      </p>
+                    ),
+                    blockquote: ({ children }) => (
+                      <blockquote className="border-l-4 border-primary pl-6 italic bg-muted/50 py-4 my-6 rounded-r-lg">
+                        {children}
+                      </blockquote>
+                    ),
+                  }}
+                >
                   {content || "*No content yet*"}
                 </ReactMarkdown>
               </div>
             </article>
           </div>
         ) : (
-          /* Edit Mode */
           <div className="max-w-4xl mx-auto space-y-6">
-            {/* Post Settings */}
             <Card>
               <CardHeader>
                 <CardTitle>Post Settings</CardTitle>
@@ -231,7 +256,6 @@ export default function EditPostPage() {
               </CardContent>
             </Card>
 
-            {/* Title */}
             <Card>
               <CardHeader>
                 <CardTitle>Title</CardTitle>
@@ -246,7 +270,6 @@ export default function EditPostPage() {
               </CardContent>
             </Card>
 
-            {/* Content */}
             <Card>
               <CardHeader>
                 <CardTitle>Content</CardTitle>
@@ -261,7 +284,6 @@ export default function EditPostPage() {
               </CardContent>
             </Card>
 
-            {/* Excerpt */}
             <Card>
               <CardHeader>
                 <CardTitle>Excerpt</CardTitle>
@@ -282,7 +304,6 @@ export default function EditPostPage() {
               </CardContent>
             </Card>
 
-            {/* Cover Image */}
             <Card>
               <CardHeader>
                 <CardTitle>Cover Image</CardTitle>
@@ -305,7 +326,6 @@ export default function EditPostPage() {
               </CardContent>
             </Card>
 
-            {/* Tags */}
             <Card>
               <CardHeader>
                 <CardTitle>Tags</CardTitle>
