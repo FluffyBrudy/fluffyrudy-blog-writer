@@ -483,8 +483,9 @@ export default function AdminDashboard() {
                                     Delete Post
                                   </AlertDialogTitle>
                                   <AlertDialogDescription>
-                                    Are you sure you want to delete "
-                                    {post.title}"? This action cannot be undone.
+                                    Are you sure you want to delete &quot;
+                                    {post.title}&quot;? This action cannot be
+                                    undone.
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
