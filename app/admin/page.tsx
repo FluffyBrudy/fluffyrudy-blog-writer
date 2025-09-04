@@ -158,16 +158,18 @@ export default function AdminDashboard() {
     newStatus: "PUBLISHED" | "DRAFT"
   ) => {
     try {
-      const post = postsData?.posts.find((p) => p.id === postId);
-      if (!post) return;
+      const fullPostResponse = await api.getPost(postId);
+      const fullPost = fullPostResponse.data;
+
+      if (!fullPost) return;
 
       await api.updatePost(postId, {
-        title: post.title,
-        content: post.content || "",
-        excerpt: post.excerpt,
-        coverImage: post.coverImage,
+        title: fullPost.title,
+        content: fullPost.content || "",
+        excerpt: fullPost.excerpt,
+        coverImage: fullPost.coverImage,
         status: newStatus,
-        tags: post.tags.map((t) => t.name),
+        tags: fullPost.tags.map((t) => t.name),
       });
 
       const postsResponse = await api.getPosts({
@@ -208,6 +210,9 @@ export default function AdminDashboard() {
               <h1 className="text-4xl font-black text-balance">
                 Admin Dashboard
               </h1>
+              <p className="text-muted-foreground mt-2">
+                Manage your blog posts, tags, and content
+              </p>
             </div>
             <div className="flex items-center gap-4">
               <Link href="/blog">
@@ -478,9 +483,8 @@ export default function AdminDashboard() {
                                     Delete Post
                                   </AlertDialogTitle>
                                   <AlertDialogDescription>
-                                    Are you sure you want to delete &puto;
-                                    {post.title}&apos;? This action cannot be
-                                    undone.
+                                    Are you sure you want to delete "
+                                    {post.title}"? This action cannot be undone.
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
