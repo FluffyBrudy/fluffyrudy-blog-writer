@@ -117,6 +117,18 @@ class ApiClient {
     return response;
   }
 
+  async updateTag(id: number, name: string) {
+    const response = await this.client.put<
+      tags & { _count: { posts: number } }
+    >(`/api/tags/${id}`, { name });
+    return response;
+  }
+
+  async deleteTag(id: number) {
+    const response = await this.client.delete(`/api/tags/${id}`);
+    return response;
+  }
+
   async getStats() {
     const response = await this.client.get<StatsResponse>("/api/stats");
     return response;

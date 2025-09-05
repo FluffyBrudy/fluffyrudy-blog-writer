@@ -2,14 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  PenTool,
-  BookOpen,
-  Settings,
-  Zap,
-  Shield,
-  Palette,
-} from "lucide-react";
+import { PenTool, BookOpen, Settings, Zap } from "lucide-react";
 
 export default function Home() {
   const features = [
@@ -23,19 +16,7 @@ export default function Home() {
       icon: Zap,
       title: "Fast",
       description:
-        "Built with Next.js and optimized for performance. Your blog loads instantly.",
-    },
-    {
-      icon: Shield,
-      title: "Secure & Reliable",
-      description:
-        "Enterprise-grade security with automatic backups and version control.",
-    },
-    {
-      icon: Palette,
-      title: "Beautiful Design",
-      description:
-        "Stunning themes and customizable layouts that make your content shine.",
+        "Decent enough as server is used directly through nextjs api route",
     },
   ];
 

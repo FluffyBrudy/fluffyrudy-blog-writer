@@ -51,6 +51,10 @@ import {
   Trash2,
   Globe,
   FileX,
+  Tag,
+  Users,
+  Calendar,
+  BarChart3,
 } from "lucide-react";
 
 type PostWithTags = posts & { tags: tags[] };
@@ -88,7 +92,11 @@ export default function AdminDashboard() {
   const [tagsLoading, setTagsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [deletingPostId, setDeletingPostId] = useState<number | null>(null);
+  const [editingTag, setEditingTag] = useState<{
+    id: number;
+    name: string;
+  } | null>(null);
+  const [newTagName, setNewTagName] = useState("");
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -142,7 +150,7 @@ export default function AdminDashboard() {
   const handleDeletePost = async (postId: number) => {
     try {
       await api.deletePost(postId);
-      setDeletingPostId(null);
+
       const postsResponse = await api.getPosts({
         limit: 50,
         includeContent: false,
@@ -179,6 +187,51 @@ export default function AdminDashboard() {
       setPostsData(postsResponse.data);
     } catch (error) {
       console.error("Error updating post status:", error);
+    }
+  };
+
+  const handleDeleteTag = async (tagId: number) => {
+    try {
+      await api.deleteTag(tagId);
+
+      const [tagsResponse, statsResponse] = await Promise.all([
+        api.getTags(),
+        api.getStats(),
+      ]);
+      setAllTags(tagsResponse.data);
+      setStats(statsResponse.data);
+    } catch (error) {
+      console.error("Error deleting tag:", error);
+    }
+  };
+
+  const handleUpdateTag = async (tagId: number, newName: string) => {
+    try {
+      await api.updateTag(tagId, newName);
+      setEditingTag(null);
+
+      const tagsResponse = await api.getTags();
+      setAllTags(tagsResponse.data);
+    } catch (error) {
+      console.error("Error updating tag:", error);
+    }
+  };
+
+  const handleCreateTag = async () => {
+    if (!newTagName.trim()) return;
+
+    try {
+      await api.createTag(newTagName);
+      setNewTagName("");
+
+      const [tagsResponse, statsResponse] = await Promise.all([
+        api.getTags(),
+        api.getStats(),
+      ]);
+      setAllTags(tagsResponse.data);
+      setStats(statsResponse.data);
+    } catch (error) {
+      console.error("Error creating tag:", error);
     }
   };
 
@@ -512,42 +565,269 @@ export default function AdminDashboard() {
 
         <Card className="mt-8">
           <CardHeader>
-            <CardTitle>Tags Management</CardTitle>
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <CardTitle className="flex items-center gap-2">
+                <Tag className="h-5 w-5" />
+                Tags Management
+              </CardTitle>
+              <div className="flex items-center gap-2">
+                <Input
+                  placeholder="New tag name..."
+                  value={newTagName}
+                  onChange={(e) => setNewTagName(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleCreateTag()}
+                  className="w-48"
+                />
+                <Button onClick={handleCreateTag} disabled={!newTagName.trim()}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Tag
+                </Button>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             {tagsLoading ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {[...Array(8)].map((_, i) => (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {[...Array(6)].map((_, i) => (
                   <div
                     key={i}
-                    className="h-16 bg-muted rounded animate-pulse"
+                    className="h-20 bg-muted rounded animate-pulse"
                   ></div>
                 ))}
               </div>
             ) : allTags.length === 0 ? (
               <div className="text-center py-8">
-                <p className="text-muted-foreground">No tags created yet</p>
+                <Tag className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">
+                  No tags created yet
+                </h3>
+                <p className="text-muted-foreground mb-4">
+                  Create your first tag to organize your content
+                </p>
               </div>
             ) : (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {allTags.map((tag) => (
-                  <div
+                  <Card
                     key={tag.id}
-                    className="flex items-center justify-between p-3 border border-border rounded-lg"
+                    className="group hover:shadow-md transition-shadow"
                   >
-                    <div>
-                      <div className="font-medium">#{tag.name}</div>
-                      <div className="text-sm text-muted-foreground">
-                        {tag._count.posts} post
-                        {tag._count.posts !== 1 ? "s" : ""}
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          {editingTag?.id === tag.id ? (
+                            <div className="space-y-2">
+                              <Input
+                                value={editingTag.name}
+                                onChange={(e) =>
+                                  setEditingTag({
+                                    ...editingTag,
+                                    name: e.target.value,
+                                  })
+                                }
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    handleUpdateTag(tag.id, editingTag.name);
+                                  } else if (e.key === "Escape") {
+                                    setEditingTag(null);
+                                  }
+                                }}
+                                className="text-sm"
+                                autoFocus
+                              />
+                              <div className="flex gap-2">
+                                <Button
+                                  size="sm"
+                                  onClick={() =>
+                                    handleUpdateTag(tag.id, editingTag.name)
+                                  }
+                                  disabled={!editingTag.name.trim()}
+                                >
+                                  Save
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => setEditingTag(null)}
+                                >
+                                  Cancel
+                                </Button>
+                              </div>
+                            </div>
+                          ) : (
+                            <>
+                              <div className="font-medium text-balance">
+                                #{tag.name}
+                              </div>
+                              <div className="text-sm text-muted-foreground flex items-center gap-1">
+                                <Users className="h-3 w-3" />
+                                {tag._count.posts} post
+                                {tag._count.posts !== 1 ? "s" : ""}
+                              </div>
+                            </>
+                          )}
+                        </div>
+                        {editingTag?.id !== tag.id && (
+                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() =>
+                                setEditingTag({ id: tag.id, name: tag.name })
+                              }
+                            >
+                              <Edit className="h-3 w-3" />
+                            </Button>
+                            {tag._count.posts === 0 ? (
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="text-destructive hover:text-destructive"
+                                  >
+                                    <Trash2 className="h-3 w-3" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>
+                                      Delete Tag
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Are you sure you want to delete the tag
+                                      &quot;{tag.name}&quot;? This action cannot
+                                      be undone.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>
+                                      Cancel
+                                    </AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() => handleDeleteTag(tag.id)}
+                                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                    >
+                                      Delete
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            ) : (
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                disabled
+                                className="text-muted-foreground cursor-not-allowed"
+                                title={`Cannot delete: ${
+                                  tag._count.posts
+                                } post${
+                                  tag._count.posts !== 1 ? "s" : ""
+                                } using this tag`}
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
+                            )}
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  </div>
+                    </CardContent>
+                  </Card>
                 ))}
               </div>
             )}
           </CardContent>
         </Card>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5" />
+                Content Analytics
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">
+                    Average tags per post
+                  </span>
+                  <span className="font-medium">
+                    {stats.totalPosts > 0
+                      ? (
+                          allTags.reduce(
+                            (sum, tag) => sum + tag._count.posts,
+                            0
+                          ) / stats.totalPosts
+                        ).toFixed(1)
+                      : "0"}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">
+                    Most used tags
+                  </span>
+                  <span className="font-medium">
+                    {allTags.length > 0
+                      ? Math.max(...allTags.map((t) => t._count.posts))
+                      : 0}{" "}
+                    posts
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">
+                    Unused tags
+                  </span>
+                  <span className="font-medium text-orange-600">
+                    {allTags.filter((t) => t._count.posts === 0).length}
+                  </span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="h-5 w-5" />
+                Recent Activity
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {filteredPosts.slice(0, 3).map((post) => (
+                  <div
+                    key={post.id}
+                    className="flex items-center gap-3 p-2 rounded-lg bg-muted/50"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-sm truncate">
+                        {post.title}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {formatDate(post.updatedAt)}
+                      </div>
+                    </div>
+                    <Badge
+                      variant={
+                        post.status === "PUBLISHED" ? "default" : "secondary"
+                      }
+                      className="text-xs"
+                    >
+                      {post.status}
+                    </Badge>
+                  </div>
+                ))}
+                {filteredPosts.length === 0 && (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    No recent activity
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
