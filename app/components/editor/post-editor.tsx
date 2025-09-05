@@ -41,7 +41,7 @@ interface AutoSaveStatus {
   lastSaved?: Date;
 }
 
-export default function ModernPostEditor() {
+export default function PostEditor() {
   const router = useRouter();
 
   const [title, setTitle] = useState("");
@@ -284,37 +284,8 @@ export default function ModernPostEditor() {
                   </TabsContent>
 
                   <TabsContent value="preview" className="mt-0">
-                    <div className="min-h-96 prose prose-slate dark:prose-invert max-w-none">
-                      <ReactMarkdown
-                        remarkPlugins={[remarkGfm]}
-                        components={{
-                          h1: ({ children }) => (
-                            <h1 className="text-3xl font-black mt-8 mb-4 text-balance">
-                              {children}
-                            </h1>
-                          ),
-                          h2: ({ children }) => (
-                            <h2 className="text-2xl font-black mt-6 mb-3 text-balance">
-                              {children}
-                            </h2>
-                          ),
-                          h3: ({ children }) => (
-                            <h3 className="text-xl font-black mt-5 mb-2 text-balance">
-                              {children}
-                            </h3>
-                          ),
-                          p: ({ children }) => (
-                            <p className="text-pretty leading-relaxed mb-4">
-                              {children}
-                            </p>
-                          ),
-                          blockquote: ({ children }) => (
-                            <blockquote className="border-l-4 border-primary pl-6 italic bg-muted/50 py-4 my-6 rounded-r-lg">
-                              {children}
-                            </blockquote>
-                          ),
-                        }}
-                      >
+                    <div className="min-h-96 prose prose-invert dark:prose-invert max-w-none">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
                         {content || "*Start writing to see preview...*"}
                       </ReactMarkdown>
                     </div>
