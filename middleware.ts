@@ -10,7 +10,10 @@ export async function middleware(request: NextRequest) {
     const blogApi = process.env.BLOG_API_KEY;
     if (blogApi !== apiKey) {
       console.error("invalid api key");
-      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+      return NextResponse.json(
+        { error: "api key is required" },
+        { status: 401 }
+      );
     }
     return NextResponse.next();
   } catch (error) {

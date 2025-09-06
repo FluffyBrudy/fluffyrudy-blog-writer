@@ -5,6 +5,7 @@ import "./globals.css";
 import { ThemeProvider } from "./components/theme/theme-provider";
 import { MainNav } from "@/components/navigation/main-nav";
 import { Footer } from "@/components/navigation/footer";
+import { NotificationProvider } from "./providers/notification-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -66,11 +67,13 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ThemeProvider>
-          <div className="relative flex min-h-screen flex-col">
-            <MainNav />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </div>
+          <NotificationProvider>
+            <div className="relative flex min-h-screen flex-col">
+              <MainNav />
+              <main className="flex-1">{children}</main>
+              <Footer />
+            </div>
+          </NotificationProvider>
         </ThemeProvider>
       </body>
     </html>

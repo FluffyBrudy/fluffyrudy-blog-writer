@@ -32,6 +32,18 @@ class ApiClient {
     });
 
     this.client.interceptors.request.use((config) => {
+      if (
+        typeof window !== "undefined" &&
+        config.method &&
+        config.method.toUpperCase() !== "GET"
+      ) {
+        /**
+         * // public because im  the only one who know have api key and wont add this in deployment. lol
+         */
+        const key = process.env.NEXT_PUBLIC_BLOG_API;
+        if (key) config.headers.set("api-key", key);
+      }
+
       return config;
     });
 
@@ -45,7 +57,26 @@ class ApiClient {
       },
       (err) => {
         const e = err as AxiosError;
-        return Promise.reject({ error: e.response?.data });
+        const status = e.response?.status;
+        const data = e.response?.data as { error?: string; message?: string };
+
+        if (typeof window !== "undefined") {
+          const title = data?.error || e.message || "Request Error";
+          const description =
+            data?.message ||
+            (status === 401
+              ? "You are not authorized to perform this action. Please provide a valid API key."
+              : status === 503
+              ? "Authentication service is unavailable. Please try again later."
+              : "An unexpected error occurred.");
+          window.dispatchEvent(
+            new CustomEvent("app:error", {
+              detail: { title, description, status },
+            })
+          );
+        }
+
+        return Promise.reject({ error: data, status });
       }
     );
   }
