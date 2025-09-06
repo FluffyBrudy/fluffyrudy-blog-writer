@@ -190,7 +190,7 @@ export default function BlogPostPage() {
               src={post.coverImage || "/placeholder.svg"}
               alt={post.title}
               fill
-              className="object-cover"
+              className="object-fill"
               priority
             />
           </div>
