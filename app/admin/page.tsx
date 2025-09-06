@@ -437,7 +437,7 @@ export default function AdminDashboard() {
                             {post.title}
                           </div>
                           {post.excerpt && (
-                            <div className="text-sm text-muted-foreground text-pretty line-clamp-2">
+                            <div className="text-sm w-[0.5] text-muted-foreground text-pretty line-clamp-2">
                               {post.excerpt}
                             </div>
                           )}

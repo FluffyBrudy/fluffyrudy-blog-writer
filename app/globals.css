@@ -123,10 +123,10 @@
   }
 }
 
-.prose pre {
+.light .prose pre {
   @apply bg-gray-100 text-gray-800;
 }
 
-.prose code {
+.light .prose code {
   @apply text-gray-800;
 }
