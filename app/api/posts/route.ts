@@ -11,20 +11,23 @@ export async function GET(request: NextRequest) {
     const offset = Number.parseInt(searchParams.get("offset") || "0");
     const includeContent = searchParams.get("includeContent") === "true";
 
-    const where: { status?: EStatus; tags?: { some?: { name?: string } } } = {};
-    if (status) where.status = status;
+    const where: {
+      status?: EStatus;
+      tags?: { some: { name: string } };
+    } = {};
+
+    if (status) {
+      where.status = status;
+    }
+
     if (tag) {
       where.tags = {
         some: { name: tag },
       };
     }
 
-    const tags = tag ? { some: { name: tag } } : undefined;
     const posts = await prisma.posts.findMany({
-      where: {
-        status: status || undefined,
-        tags,
-      },
+      where,
       select: {
         id: true,
         title: true,
@@ -34,7 +37,7 @@ export async function GET(request: NextRequest) {
         status: true,
         createdAt: true,
         updatedAt: true,
-        content: includeContent,
+        content: includeContent, 
         tags: {
           select: {
             id: true,
