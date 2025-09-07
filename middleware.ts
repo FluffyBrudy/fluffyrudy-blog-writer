@@ -1,3 +1,4 @@
+import { HttpStatusCode } from "axios";
 import { type NextRequest, NextResponse } from "next/server";
 
 export async function middleware(request: NextRequest) {
@@ -62,6 +63,11 @@ export async function middleware(request: NextRequest) {
 
   try {
     const blogApi = process.env.BLOG_API_KEY;
+    if (!blogApi)
+      return NextResponse.json(
+        { error: "Internal server error(intentional)" },
+        { status: 500 }
+      );
     if (blogApi !== apiKey) {
       console.error("invalid api key");
       return NextResponse.json(
