@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useCallback } from "react";
 import CodeMirror from "@uiw/react-codemirror";
 import { history, undo, redo } from "@codemirror/commands";
@@ -51,7 +53,10 @@ export default function MarkdownEditor({
     [onChange]
   );
 
-  const theme = localStorage.getItem("theme") === "dark" ? "dark" : "light";
+  const theme =
+    typeof window !== "undefined" && window.localStorage?.getItem("theme") === "dark"
+      ? "dark"
+      : "light";
 
   return (
     <CodeMirror
