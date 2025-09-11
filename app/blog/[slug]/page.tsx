@@ -4,14 +4,13 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { api } from "@/lib/api";
 import type { posts, tags } from "@prisma/client";
 import { ArrowLeft, Calendar, Clock, Share2 } from "lucide-react";
+import { MarkdownPreview } from "@/app/components/editor/markdown-preview";
 
 type PostWithTags = posts & { tags: tags[] };
 
@@ -197,46 +196,7 @@ export default function BlogPostPage() {
         )}
 
         <div className="prose prose-lg prose-slate dark:prose-invert max-w-none mb-12">
-          <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            components={{
-              h1: ({ children }) => (
-                <h1 className="text-3xl font-black mt-8 mb-4 text-balance">
-                  {children}
-                </h1>
-              ),
-              h2: ({ children }) => (
-                <h2 className="text-2xl font-black mt-6 mb-3 text-balance">
-                  {children}
-                </h2>
-              ),
-              h3: ({ children }) => (
-                <h3 className="text-xl font-black mt-5 mb-2 text-balance">
-                  {children}
-                </h3>
-              ),
-              p: ({ children }) => (
-                <p className="text-pretty leading-relaxed mb-4">{children}</p>
-              ),
-              blockquote: ({ children }) => (
-                <blockquote className="border-l-4 border-primary pl-6 italic bg-muted/50 py-4 my-6 rounded-r-lg">
-                  {children}
-                </blockquote>
-              ),
-              code: ({ children }) => (
-                <code className="bg-muted px-2 py-1 rounded text-sm font-mono">
-                  {children}
-                </code>
-              ),
-              pre: ({ children }) => (
-                <pre className="bg-muted p-4 rounded-lg overflow-x-auto my-6">
-                  {children}
-                </pre>
-              ),
-            }}
-          >
-            {post.content}
-          </ReactMarkdown>
+          <MarkdownPreview content={post.content} />
         </div>
 
         {relatedPosts.length > 0 && (

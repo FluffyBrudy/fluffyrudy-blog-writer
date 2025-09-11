@@ -2,8 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -35,7 +33,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-
+import "katex/dist/katex.min.css";
+import { MarkdownPreview } from "./markdown-preview";
 interface AutoSaveStatus {
   status: "idle" | "saving" | "saved" | "error";
   lastSaved?: Date;
@@ -285,9 +284,9 @@ export default function PostEditor() {
 
                   <TabsContent value="preview" className="mt-0">
                     <div className="min-h-96 prose prose-invert dark:prose-invert max-w-none">
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {content || "*Start writing to see preview...*"}
-                      </ReactMarkdown>
+                      <MarkdownPreview
+                        content={content || "write something for preview"}
+                      />
                     </div>
                   </TabsContent>
                 </CardContent>
