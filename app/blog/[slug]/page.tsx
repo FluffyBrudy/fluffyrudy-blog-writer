@@ -10,7 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { api } from "@/lib/api";
 import type { posts, tags } from "@prisma/client";
 import { ArrowLeft, Calendar, Clock, Share2 } from "lucide-react";
-import { MarkdownPreview } from "@/app/components/editor/markdown-preview";
+import { MarkdownPreview } from "@/app/components/editor/ui/markdown-preview";
 
 type PostWithTags = posts & { tags: tags[] };
 

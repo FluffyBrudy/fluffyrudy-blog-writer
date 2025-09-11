@@ -34,7 +34,8 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import "katex/dist/katex.min.css";
-import { MarkdownPreview } from "./markdown-preview";
+import { MarkdownPreview } from "./ui/markdown-preview";
+import MarkdownEditor from "./ui/markdown-editor";
 interface AutoSaveStatus {
   status: "idle" | "saving" | "saved" | "error";
   lastSaved?: Date;
@@ -274,12 +275,7 @@ export default function PostEditor() {
 
                 <CardContent>
                   <TabsContent value="write" className="mt-0">
-                    <Textarea
-                      placeholder="Write your post content in Markdown..."
-                      value={content}
-                      onChange={(e) => setContent(e.target.value)}
-                      className="min-h-96 font-mono text-base resize-none border-0 px-0 focus-visible:ring-0"
-                    />
+                    <MarkdownEditor content={content} onChange={setContent} />
                   </TabsContent>
 
                   <TabsContent value="preview" className="mt-0">
