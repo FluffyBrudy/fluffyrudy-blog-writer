@@ -19,9 +19,8 @@ import type { tags, posts } from "@prisma/client";
 import type { PostCreateBody } from "@/types/post";
 import { ArrowLeft, Save, Eye } from "lucide-react";
 import Link from "next/link";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import Image from "next/image";
+import { MarkdownPreview } from "@/app/components/editor/ui/markdown-preview";
 
 type PostWithTags = posts & { tags: tags[] };
 
@@ -192,38 +191,7 @@ export default function EditPostPage() {
               )}
 
               <div className="prose prose-lg prose-slate dark:prose-invert max-w-none">
-                <ReactMarkdown
-                  remarkPlugins={[remarkGfm]}
-                  components={{
-                    h1: ({ children }) => (
-                      <h1 className="text-3xl font-black mt-8 mb-4 text-balance">
-                        {children}
-                      </h1>
-                    ),
-                    h2: ({ children }) => (
-                      <h2 className="text-2xl font-black mt-6 mb-3 text-balance">
-                        {children}
-                      </h2>
-                    ),
-                    h3: ({ children }) => (
-                      <h3 className="text-xl font-black mt-5 mb-2 text-balance">
-                        {children}
-                      </h3>
-                    ),
-                    p: ({ children }) => (
-                      <p className="text-pretty leading-relaxed mb-4">
-                        {children}
-                      </p>
-                    ),
-                    blockquote: ({ children }) => (
-                      <blockquote className="border-l-4 border-primary pl-6 italic bg-muted/50 py-4 my-6 rounded-r-lg">
-                        {children}
-                      </blockquote>
-                    ),
-                  }}
-                >
-                  {content || "*No content yet*"}
-                </ReactMarkdown>
+                <MarkdownPreview content={content} />
               </div>
             </article>
           </div>
